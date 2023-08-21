@@ -1,0 +1,15 @@
+server:
+  port: 3000
+
+db:
+  type: 'mysql'
+  host: 'localhost'
+  port: 3306
+  username: 'root'
+  password: 'password'
+  database: 'test'
+  synchronize: true
+
+jwt:
+  expiresIn: '2y'
+  secret: 'afric'

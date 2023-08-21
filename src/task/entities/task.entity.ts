@@ -13,6 +13,7 @@ export class Task {
 
   @Column()
   deadline: string;
+    static user: any;
 
   // Add other fields as needed
 }

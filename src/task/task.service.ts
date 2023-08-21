@@ -1,35 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Task } from './entities/task.entity';
-import { CreateTaskDto } from './dto/create-task.dto';
- import { UpdateTaskDto } from './dto/update-task.dto';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateTaskDto } from './dto/create-task.dto'
+import { UpdateTaskDto } from './dto/update-task.dto'
+
+import { InjectRepository } from '@nestjs/typeorm'
+import { TaskRepository } from './task.repository'
+import { Task } from './entities/task.entity'
+import { User } from 'src/auth/entities/user.entity'
 
 @Injectable()
 export class TaskService {
+
   constructor(
     @InjectRepository(Task)
-    private taskRepository: Repository<Task>,
-  ) {}
+    private tasksRepository: typeof TaskRepository
+  ) {} 
 
-  async createTask(title: string, description: string): Promise<Task> {
-    const task = this.taskRepository.create({ title, description });
-    return this.taskRepository.save(task);
+  createTask(
+    task: CreateTaskDto,
+    user: User
+  ): Promise<Task> {
+    return this.tasksRepository.createTask(task, user)
   }
 
-  async getAllTasks(): Promise<Task[]> {
-    return this.taskRepository.find();
+  async getAllTasks(user: User): Promise<Task[]> {
+    return this.tasksRepository.find({
+      where: { user },
+    });
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} task`;
-  // }
+   async findOne(id: number, user: User): Promise<Task> {
+    const found = await this.tasksRepository.findOne({ id, user });
 
-  // update(id: number, updateTaskDto: UpdateTaskDto) {
-  //   return `This action updates a #${id} task`;
-  // }
+    if (!found) {
+      throw new NotFoundException(`${id} not found`);
+    }
+    
+    return found;
+  }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} task`;
-  // }
+  async update(id: number, task: UpdateTaskDto, user: User) {
+    this.tasksRepository.update(id, task, user)
+  }
+
+  async remove(id: number, user: User) {
+    this.tasksRepository.remove(id, user)
+  }
 }

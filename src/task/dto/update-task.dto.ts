@@ -15,9 +15,5 @@ export class UpdateTaskDto {
   @IsNotEmpty()
   public desc: string;
 
-  // Validates for an integer
-  @IsString()
-  public deadline: number;
-
   public user
 }
