@@ -33,13 +33,20 @@ export class TaskController {
     return this.taskService.findOne(id, user);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-  //   return this.taskService.update(+id, updateTaskDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTaskDto: UpdateTaskDto, // Use your DTO
+    @GetUser() user: User, // Make sure to provide the user
+  ) {
+    return this.taskService.update(id, updateTaskDto, user);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.taskService.remove(+id);
-  // }
+  @Delete(':id')
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User, // Make sure to provide the user
+  ) {
+    return this.taskService.remove(id, user);
+  }
 }
