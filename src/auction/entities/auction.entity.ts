@@ -1,20 +1,21 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class Task {
+export class Auction {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string;
+  nftAddress: string;
 
   @Column()
-  desc: string;
+  startDate: Date;
 
   @Column()
-  deadline: string;
-    static user: any;
+  endDate: Date;
 
-  // Add other fields as needed
+  @Column()
+  Likes: number;
+  static user: any;
 }
 

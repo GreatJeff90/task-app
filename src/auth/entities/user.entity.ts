@@ -1,32 +1,24 @@
-import { Task } from 'src/task/entities/task.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Unique } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Nft } from "src/nft/entities/nft.entity"
+import { Auction } from "src/auction/entities/auction.entity"
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @Column()
-    first_name: string;
-  
-    @Column()
-    last_name: string;
-  
-    @Column()
-    @Unique(['string'])
-    username: string;
-  
-    @Column()
-    email: string;
-  
-    @Column()
-    salt: string;
-  
-    @Column()
-    password: string;
-  
-    @OneToMany(type => Task, product => Task.user, { eager: true })
-    products: Task[]
-}
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-{}
+  @Column({ unique: true })
+  walletAddress: string;
+
+  @Column({ nullable: true })
+  preferredWallet: string;
+
+  @Column({ nullable: true })
+  avatarUrl: string;
+
+  @OneToMany(() => Nft, nft => nft.id, { eager: true })
+  nft: Nft[];
+
+  @OneToMany(() => Auction, auction => auction.id, { eager: true })
+  auction: Auction[];
+}

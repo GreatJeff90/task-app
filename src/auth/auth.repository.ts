@@ -1,49 +1,45 @@
-import { User } from './entities/user.entity'
-import { Repository } from 'typeorm'
-import * as bcrypt from 'bcrypt'
-import { RegisterUserDto } from './dto/register-user.dto'
-import { LoginUserDto } from './dto/login-user.dto'
-import { NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
-export interface AuthRepository extends Repository<User> {
+@Injectable()
+export class AuthService {
+  constructor(private readonly authRepository: AuthRepository) {}
 
-    this: Repository<User>
-    register(data)
-    validateUserPassword({email, password})
-    userExists({email})
-}
+  async register(registerUserDto: RegisterUserDto): Promise<User> {
+    return this.authRepository.register(registerUserDto);
+  }
 
-export const CustomAuthRepository: Pick<AuthRepository, any> = {
-    async register(registerUserDto: RegisterUserDto): Promise<RegisterUserDto> {
+  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string }> {
+    const { walletAddress } = loginUserDto;
+    const userExists = await this.authRepository.userExists({ walletAddress });
 
-        const { password } = registerUserDto
-     
-        const salt  = await bcrypt.genSalt()
-    
-        registerUserDto.salt = salt
-        registerUserDto.password = await hashPassWord(password, salt)
-    
-        return this.save(registerUserDto);
-      },
-
-    async validateUserPassword(loginUserDto: LoginUserDto): Promise<boolean> {
-        const { email, password } = loginUserDto
-    
-       // Check if details exist
-        const found = await this.findOneBy({email})
-    
-        if (!found) throw new NotFoundException(`User with email: ${email} not found`)
-        
-        // compare password
-        return await comparePassword(password, found.password)
-    
+    if (!userExists) {
+      throw new NotFoundException(`User with wallet address: ${walletAddress} not found`);
     }
+
+    // Generate and return an access token
+    const accessToken = 'generate_your_access_token_here'; // Replace with actual token generation logic
+
+    return { accessToken };
+  }
 }
 
-const hashPassWord = (password: any, salt: any) => {
-    return bcrypt.hash(password, salt)
+interface AuthRepository extends Repository<User> {
+  register(data: RegisterUserDto): Promise<User>;
+  userExists({ walletAddress }): Promise<boolean>;
 }
 
-const comparePassword = async (plaintextPassword, hash) => {
-    return await bcrypt.compare(plaintextPassword, hash)
-}
+const CustomAuthRepository: Pick<AuthRepository, any> = {
+  async register(registerUserDto: RegisterUserDto): Promise<User> {
+    return this.save(registerUserDto);
+  },
+
+  async userExists({ walletAddress }): Promise<boolean> {
+    const found = await this.findOne({ walletAddress });
+
+    return !!found;
+  },
+};

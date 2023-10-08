@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class UpdateTaskDto {
+export class UpdateCategoryDto {
   @IsNumber()
   public id: number
 
@@ -13,7 +13,7 @@ export class UpdateTaskDto {
   // Gets only validated if it's part of the request's body
   @IsString()
   @IsNotEmpty()
-  public desc: string;
+  public imgUrl: string;
 
   public user
 }

@@ -5,11 +5,6 @@ export class LoginUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail()
-  public email: string;
+  public walletAddress: string;
 
-
-  @IsString()
-  @IsNotEmpty()
-  public password: string;
 }

@@ -1,36 +1,33 @@
+// auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthRepository } from './auth.repository'
-import { User } from './entities/user.entity'
-import { RegisterUserDto } from './dto/register-user.dto'
-import { LoginUserDto } from './dto/login-user.dto'
-import { JwtService } from '@nestjs/jwt'
-import { JwtPayload } from './jwt-payload.interface'
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) 
-  private readonly authRepository: AuthRepository,
-  private jwtService: JwtService
-) {}
+  jwtService: any;
+  userService: any;
+  // ... other methods and dependencies
 
-  async register(data: RegisterUserDto): Promise<User> {
-    return this.authRepository.register(data)
+  async register(userData: RegisterUserDto): Promise<User> {
+    // Create a new user with the provided wallet address
+    const newUser = await this.userService.createUser(userData.walletAddress);
+    // ... other registration logic
+    return newUser;
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<{ accessToken: string}> {
+  async login(loginData: LoginUserDto): Promise<{ accessToken: string }> {
+    // Authenticate the user using the provided wallet address
+    const user = await this.userService.findByWalletAddress(loginData.walletAddress);
 
-    const res = this.authRepository.validateUserPassword(loginUserDto)
+    // If user is found, generate and return an access token
+    if (user) {
+      const accessToken = this.jwtService.sign({ sub: user.id });
+      return { accessToken };
+    }
 
-    if (!res) throw new UnauthorizedException('Invalid credentials')
-
-    const { email } = loginUserDto
-
-    const payload: JwtPayload = { email }
-
-    const accessToken = this.jwtService.sign(payload)
-
-    return { accessToken }
-
+    // Handle authentication failure (user not found)
+    throw new UnauthorizedException('Invalid wallet address');
   }
 }

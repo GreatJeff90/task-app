@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateTaskDto {
+export class CreateNotificationDto {
 @IsNumber()
 public id: number
 
@@ -12,7 +12,8 @@ public id: number
   // Gets only validated if it's part of the request's body
   @IsString()
   @IsNotEmpty()
-  public desc: string;
+  public body: string;
 
   public user
+  property1: any;
 }
